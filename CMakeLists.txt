@@ -49,6 +49,10 @@ add_executable(joint_sim src/joint_sim.cpp)
 ament_target_dependencies(joint_sim
   rclcpp geometry_msgs sensor_msgs tf2 tf2_ros ros2_unitree_legged_msgs)
 
+add_executable(high_state_sim src/high_state_sim.cpp)
+ament_target_dependencies(high_state_sim
+  rclcpp geometry_msgs sensor_msgs tf2 tf2_ros ros2_unitree_legged_msgs)
+
 add_executable(ros2_udp src/ros2_udp.cpp)
 target_link_libraries(ros2_udp ${EXTRA_LIBS})
 ament_target_dependencies(ros2_udp rclcpp ros2_unitree_legged_msgs)
@@ -90,6 +94,7 @@ install(DIRECTORY
 install(TARGETS
   state_publisher
   joint_sim
+  high_state_sim
   ros2_udp
   ros2_walk_example
   cmd_interface

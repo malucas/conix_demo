@@ -22,18 +22,20 @@ class StateToJointConv: public rclcpp::Node
         StateToJointConv()
         : Node("state_to_joint_converter")
         {
-            publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
+            publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 1);
             subscription_ = this->create_subscription<ros2_unitree_legged_msgs::msg::HighState>(
                 "high_state", 10, std::bind(&StateToJointConv::high_state_callback, this, _1));
+            
+            RCLCPP_INFO(this->get_logger(), "Initialized state to joint converter.");
         }
 
     private:
-        void high_state_callback(const ros2_unitree_legged_msgs::msg::HighState::SharedPtr high_state) const
+        void high_state_callback(const ros2_unitree_legged_msgs::msg::HighState::SharedPtr high_state)
         {
-            // auto time = this->get_clock().now();
+            auto time = this->get_clock()->now();
 
             sensor_msgs::msg::JointState joint_state;
-            // joint_state.header.stamp = time;
+            joint_state.header.stamp = time;
 
             joint_state.name.push_back("FR_hip_joint");
             joint_state.name.push_back("FR_thigh_joint");

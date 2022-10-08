@@ -7,6 +7,9 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_gui = LaunchConfiguration('use_gui', default='true')
+
     urdf_file_name = 'go1.urdf'
     urdf = os.path.join(
         get_package_share_directory('conix_demo'),
@@ -14,6 +17,12 @@ def generate_launch_description():
         urdf_file_name)
     with open(urdf, 'r') as infp:
         robot_desc = infp.read()
+        
+    rviz_file_name = 'check_joint.rviz'
+    rviz_path = os.path.join(
+        get_package_share_directory('conix_demo'),
+        'go1_description/launch',
+        rviz_file_name)
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -25,18 +34,23 @@ def generate_launch_description():
             executable='robot_state_publisher',
             name='robot_state_publisher',
             output='screen',
-            parameters=[{'robot_description': robot_desc}],
+            parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_desc}],
             arguments=[urdf]),
+        # Node(
+        #     package='joint_state_publisher_gui',
+        #     executable='joint_state_publisher_gui',
+        #     name='joint_state_publisher_gui',
+        #     output='screen'),
         Node(
             package='conix_demo',
-            executable="state_to_joint_converter",
-            name="state_to_joint_converter",
-            output="screen",
-        ),
+            executable='joint_sim',
+            name='joint_sim',
+            output='screen'),
         # Node(
-        #     package='conix_demo',
-        #     executable="cmd_interface",
-        #     name="cmd_interface",
-        #     output="screen",
+        #     package='rviz2',
+        #     executable='rviz2',
+        #     name='rviz2',
+        #     output='screen',
+        #     arguments=['-d', [rviz_path]]
         # ),
     ])
