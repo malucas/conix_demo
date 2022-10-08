@@ -24,7 +24,7 @@ class JointSim: public rclcpp::Node
             child_frame_ = this->declare_parameter("child_frame", "base");
 
             timer_ = this->create_wall_timer(
-                200ms, std::bind(&JointSim::timer_callback, this));
+                50ms, std::bind(&JointSim::timer_callback, this));
 
             publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 
@@ -53,7 +53,7 @@ class JointSim: public rclcpp::Node
             t.transform.rotation.z = q.z();
             t.transform.rotation.w = q.w();
 
-            tf_broadcaster_->sendTransform(t);
+            // tf_broadcaster_->sendTransform(t);
 
             sensor_msgs::msg::JointState joint_state;
             joint_state.header.stamp = time;

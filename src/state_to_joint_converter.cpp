@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <cmath>
+#include <array>
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/transform_stamped.hpp"
@@ -12,6 +13,8 @@
 #include "ros2_unitree_legged_msgs/msg/high_state.hpp"
 
 using std::placeholders::_1;
+
+std::array<int, 12> joint_map {0,1,2,3,4,5,6,7,8,9,10,11};
 
 class StateToJointConv: public rclcpp::Node
 {
@@ -45,24 +48,25 @@ class StateToJointConv: public rclcpp::Node
             joint_state.name.push_back("RL_thigh_joint");
             joint_state.name.push_back("RL_calf_joint");
         
-            joint_state.position.push_back(double(high_state->motor_state[0].q));
-            joint_state.position.push_back(double(high_state->motor_state[1].q));
-            joint_state.position.push_back(double(high_state->motor_state[2].q));
-            joint_state.position.push_back(double(high_state->motor_state[3].q));
-            joint_state.position.push_back(double(high_state->motor_state[4].q));
-            joint_state.position.push_back(double(high_state->motor_state[5].q));
-            joint_state.position.push_back(double(high_state->motor_state[6].q));
-            joint_state.position.push_back(double(high_state->motor_state[7].q));
-            joint_state.position.push_back(double(high_state->motor_state[8].q));
-            joint_state.position.push_back(double(high_state->motor_state[9].q));
-            joint_state.position.push_back(double(high_state->motor_state[10].q)); 
-            joint_state.position.push_back(double(high_state->motor_state[11].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[0]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[1]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[2]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[3]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[4]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[5]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[6]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[7]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[8]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[9]].q));
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[10]].q)); 
+            joint_state.position.push_back(double(high_state->motor_state[joint_map[11]].q));
 
             publisher_->publish(joint_state);
         }
 
         rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisher_;
         rclcpp::Subscription<ros2_unitree_legged_msgs::msg::HighState>::SharedPtr subscription_;
+
 };
 
 int main(int argc, char * argv[])

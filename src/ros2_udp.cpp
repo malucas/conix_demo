@@ -94,7 +94,7 @@ int main(int argc, char **argv)
     pub_high = node->create_publisher<ros2_unitree_legged_msgs::msg::HighState>("high_state", 1);
     sub_high = node->create_subscription<ros2_unitree_legged_msgs::msg::HighCmd>("high_cmd", 1, highCmdCallback);
 
-    rclcpp::spin(node)
+    rclcpp::spin(node);
     rclcpp::shutdown();
 
     return 0;
