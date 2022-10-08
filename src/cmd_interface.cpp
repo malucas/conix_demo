@@ -27,7 +27,7 @@ class CmdInterface : public rclcpp::Node
             std::cin.ignore();
 
             timer_ = this->create_wall_timer(200ms, std::bind(&CmdInterface::timer_callback, this));
-            publisher_ = this->create_publisher<ros2_unitree_legged_msgs::msg::HighCmd>("high_cmd", 10);
+            publisher_ = this->create_publisher<ros2_unitree_legged_msgs::msg::HighCmd>("high_cmd", 1);
         }
     
     private:

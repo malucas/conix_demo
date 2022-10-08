@@ -41,10 +41,9 @@ def generate_launch_description():
         ),
         Node(
             package = "conix_demo",
-            executable= "high_state_sim",
-            name = "high_state_sim",
+            executable= "ros2_udp",
+            name = "ros2_udp",
             output= "screen",
-            parameters = [{"parent_frame": "world", "child_frame": "base"}],
         ),
         Node(
             package='rviz2',
@@ -53,4 +52,10 @@ def generate_launch_description():
             output='screen',
             arguments=['-d', [rviz_path]]
         ),
+        # Node(
+        #     package='conix_demo',
+        #     executable="cmd_interface",
+        #     name="cmd_interface",
+        #     output="screen",
+        # ),
     ])

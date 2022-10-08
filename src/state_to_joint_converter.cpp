@@ -24,7 +24,7 @@ class StateToJointConv: public rclcpp::Node
         {
             publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 1);
             subscription_ = this->create_subscription<ros2_unitree_legged_msgs::msg::HighState>(
-                "high_state", 10, std::bind(&StateToJointConv::high_state_callback, this, _1));
+                "high_state", 1, std::bind(&StateToJointConv::high_state_callback, this, _1));
             
             RCLCPP_INFO(this->get_logger(), "Initialized state to joint converter.");
         }

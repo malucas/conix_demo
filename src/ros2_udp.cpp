@@ -1,3 +1,9 @@
+#include <memory>
+#include <sstream>
+#include <string>
+#include <cmath>
+#include <array>
+
 #include "rclcpp/rclcpp.hpp"
 #include "ros2_unitree_legged_msgs/msg/high_cmd.hpp"
 #include "ros2_unitree_legged_msgs/msg/high_state.hpp"
@@ -7,94 +13,63 @@
 #include "convert.h"
 
 using namespace UNITREE_LEGGED_SDK;
-class Custom
+
+class Ros2Udp : public rclcpp::Node 
 {
-public:
-    UDP low_udp;
-    UDP high_udp;
+    public:
+        Ros2Udp()
+        : Node("ros2_udp"),
+          high_udp_(8090, "192.168.123.161", 8082, sizeof(HighCmd), sizeof(HighState)),
+          high_count_ {0},
+          high_cmd_ {0},
+          high_state_ {0}
+        {
+            using std::placeholders::_1;
 
-    HighCmd high_cmd = {0};
-    HighState high_state = {0};
+            pub_high_ = this->create_publisher<ros2_unitree_legged_msgs::msg::HighState>("high_state", 1);
+            sub_high_ = this->create_subscription<ros2_unitree_legged_msgs::msg::HighCmd>(
+                "high_cmd", 1, std::bind(&Ros2Udp::high_cmd_callback, this, _1));
 
-    LowCmd low_cmd = {0};
-    LowState low_state = {0};
+            high_udp_.InitCmdData(high_cmd_);
 
-public:
-    Custom()
-        : low_udp(LOWLEVEL),
-          high_udp(8090, "192.168.123.161", 8082, sizeof(HighCmd), sizeof(HighState))
-    {
-        high_udp.InitCmdData(high_cmd);
-        low_udp.InitCmdData(low_cmd);
-    }
+            RCLCPP_INFO(this->get_logger(), "Initialized udp node!");
+        }
+        
+    private:
+        void high_cmd_callback(const ros2_unitree_legged_msgs::msg::HighCmd::SharedPtr msg)
+        {
+            RCLCPP_INFO(this->get_logger(), "Received high command! ", high_count_);
+
+            high_cmd_ = rosMsg2Cmd(msg);
+
+            high_udp_.SetSend(high_cmd_);
+            high_udp_.Send();
+
+            ros2_unitree_legged_msgs::msg::HighState high_state_ros;
+
+            high_udp_.Recv();
+            high_udp_.GetRecv(high_state_);
+
+            high_state_ros = state2rosMsg(high_state_);
+
+            pub_high_->publish(high_state_ros);
+
+            high_count_++;
+        }
+
+        rclcpp::Subscription<ros2_unitree_legged_msgs::msg::HighCmd>::SharedPtr sub_high_;
+        rclcpp::Publisher<ros2_unitree_legged_msgs::msg::HighState>::SharedPtr pub_high_;
+
+        long high_count_;
+        UDP high_udp_;
+        HighCmd high_cmd_;
+        HighState high_state_;
 };
-
-Custom custom;
-
-rclcpp::Subscription<ros2_unitree_legged_msgs::msg::HighCmd>::SharedPtr sub_high;
-rclcpp::Subscription<ros2_unitree_legged_msgs::msg::LowCmd>::SharedPtr sub_low;
-
-rclcpp::Publisher<ros2_unitree_legged_msgs::msg::HighState>::SharedPtr pub_high;
-rclcpp::Publisher<ros2_unitree_legged_msgs::msg::LowState>::SharedPtr pub_low;
-
-long high_count = 0;
-long low_count = 0;
-
-void highCmdCallback(const ros2_unitree_legged_msgs::msg::HighCmd::SharedPtr msg)
-{
-    printf("highCmdCallback is running !\t%ld\n", ::high_count);
-
-    custom.high_cmd = rosMsg2Cmd(msg);
-
-    custom.high_udp.SetSend(custom.high_cmd);
-    custom.high_udp.Send();
-
-    ros2_unitree_legged_msgs::msg::HighState high_state_ros;
-
-    custom.high_udp.Recv();
-    custom.high_udp.GetRecv(custom.high_state);
-
-    high_state_ros = state2rosMsg(custom.high_state);
-
-    pub_high->publish(high_state_ros);
-
-    printf("highCmdCallback ending !\t%ld\n\n", ::high_count++);
-}
-
-void lowCmdCallback(const ros2_unitree_legged_msgs::msg::LowCmd::SharedPtr msg)
-{
-
-    printf("lowCmdCallback is running !\t%ld\n", low_count);
-
-    custom.low_cmd = rosMsg2Cmd(msg);
-
-    custom.low_udp.SetSend(custom.low_cmd);
-    custom.low_udp.Send();
-
-    ros2_unitree_legged_msgs::msg::LowState low_state_ros;
-
-    custom.low_udp.Recv();
-    custom.low_udp.GetRecv(custom.low_state);
-
-    low_state_ros = state2rosMsg(custom.low_state);
-
-    pub_low->publish(low_state_ros);
-
-    printf("lowCmdCallback ending!\t%ld\n\n", ::low_count++);
-}
 
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-
-    auto node = rclcpp::Node::make_shared("node_ros2_udp");
-
-    printf("CONIX DEMO: high level runing!\n");
-
-    pub_high = node->create_publisher<ros2_unitree_legged_msgs::msg::HighState>("high_state", 1);
-    sub_high = node->create_subscription<ros2_unitree_legged_msgs::msg::HighCmd>("high_cmd", 1, highCmdCallback);
-
-    rclcpp::spin(node);
+    rclcpp::spin(std::make_shared<Ros2Udp>());
     rclcpp::shutdown();
 
     return 0;

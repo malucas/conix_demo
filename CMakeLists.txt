@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(conix_demo)
+set(UNITREE_SDK_VERSION 3.4.2)
 
 # # Default to C99
 # if(NOT CMAKE_C_STANDARD)
@@ -36,10 +37,10 @@ set(CMAKE_CXX_FLAGS "-O3")
 
 include_directories(
     include
-    ${CMAKE_SOURCE_DIR}/unitree_legged_sdk-3.4.2/include
+    ${CMAKE_SOURCE_DIR}/unitree_legged_sdk-${UNITREE_SDK_VERSION}/include
 )
 
-link_directories(${CMAKE_SOURCE_DIR}/unitree_legged_sdk-3.4.2/lib)
+link_directories(${CMAKE_SOURCE_DIR}/unitree_legged_sdk-${UNITREE_SDK_VERSION}/lib)
 
 add_executable(state_publisher src/state_publisher.cpp)
 ament_target_dependencies(state_publisher
@@ -87,7 +88,7 @@ install(DIRECTORY
 )
 
 install(DIRECTORY 
-    ${CMAKE_SOURCE_DIR}/unitree_legged_sdk-3.4.2/lib/
+    ${CMAKE_SOURCE_DIR}/unitree_legged_sdk-${UNITREE_SDK_VERSION}/lib/
     DESTINATION lib
 )
 
