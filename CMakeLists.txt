@@ -56,19 +56,23 @@ ament_target_dependencies(high_state_sim
 
 add_executable(ros2_udp src/ros2_udp.cpp)
 target_link_libraries(ros2_udp ${EXTRA_LIBS})
-ament_target_dependencies(ros2_udp rclcpp ros2_unitree_legged_msgs)
+ament_target_dependencies(ros2_udp 
+  rclcpp ros2_unitree_legged_msgs)
 
 add_executable(ros2_walk_example src/ros2_walk_example.cpp)
 target_link_libraries(ros2_walk_example ${EXTRA_LIBS})
-ament_target_dependencies(ros2_walk_example rclcpp ros2_unitree_legged_msgs)
+ament_target_dependencies(ros2_walk_example 
+  rclcpp ros2_unitree_legged_msgs)
 
 add_executable(cmd_interface src/cmd_interface.cpp)
 target_link_libraries(cmd_interface ${EXTRA_LIBS})
-ament_target_dependencies(cmd_interface rclcpp ros2_unitree_legged_msgs)
+ament_target_dependencies(cmd_interface 
+  rclcpp geometry_msgs ros2_unitree_legged_msgs)
 
 add_executable(state_to_joint_converter src/state_to_joint_converter.cpp)
 target_link_libraries(state_to_joint_converter ${EXTRA_LIBS})
-ament_target_dependencies(state_to_joint_converter sensor_msgs rclcpp ros2_unitree_legged_msgs)
+ament_target_dependencies(state_to_joint_converter 
+  sensor_msgs rclcpp ros2_unitree_legged_msgs)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
